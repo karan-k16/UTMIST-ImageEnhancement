@@ -33,16 +33,6 @@ This project was developed as part of UTMIST's research initiative in Fall 2024.
 
 ---
 
-## 🖼️ Sample Results
-
-| Low Resolution | Super-Resolved Output | Ground Truth |
-|----------------|-----------------------|--------------|
-| ![LR](examples/lr.png) | ![SR](examples/sr.png) | ![HR](examples/hr.png) |
-
-> *Add screenshots or sample images to the `examples/` folder to visualize model outputs.*
-
----
-
 ## 🚀 How to Run
 
 1. Clone the repo:
