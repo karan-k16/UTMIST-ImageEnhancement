@@ -64,5 +64,4 @@ git clone https://github.com/karan-k16/UTMIST-Image-Enhancement.git
 cd UTMIST-Image-Enhancement
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```bash
 
