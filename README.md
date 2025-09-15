@@ -35,15 +35,6 @@ This repo contains a lightweight, production-oriented pipeline from UTMIST (Fall
 
 ---
 
-## 📦 Setup
-
-```bash
-git clone https://github.com/karan-k16/UTMIST-Image-Enhancement.git
-cd UTMIST-Image-Enhancement
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```bash
-
 ## 📝 Notes
 
 - Use `--AMP` with CUDA for faster inference and lower memory.  
@@ -62,6 +53,16 @@ pip install -r requirements.txt
 
 ## 🙏 Acknowledgments
 
-Thanks to UTMIST mentors and collaborators. Inspired by residual CNN SR literature and community baselines.
+Thanks to UTMIST mentors and collaborators (Sean, Hashim, and Oscar). Inspired by residual CNN SR literature and community baselines.
 
 ---
+
+## 📦 Setup
+
+```bash
+git clone https://github.com/karan-k16/UTMIST-Image-Enhancement.git
+cd UTMIST-Image-Enhancement
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```bash
+
