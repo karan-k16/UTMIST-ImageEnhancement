@@ -424,7 +424,17 @@
   .tag.left { left: 13px; }
   .tag.right { right: 13px; color: #b9beff; border-color: var(--accent-line); background: rgba(20,21,38,.78); }
 
-  .meta { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 16px; }
+  .result-actions {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .result-actions .btn {
+    font-size: 13px; padding: 10px 16px;
+  }
+  .result-actions .btn svg {
+    width: 14px; height: 14px; margin-right: 7px; vertical-align: -2px;
+  }
+  .meta { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 12px; }
   .meta div {
     font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .03em;
     color: var(--muted-solid);
@@ -572,6 +582,16 @@
             <div class="handle" id="handle"></div>
             <span class="tag left">Original input</span>
             <span class="tag right">AI 2× upscale</span>
+          </div>
+          <div class="result-actions">
+            <button type="button" class="btn btn-primary" id="downloadBtn" onclick="downloadResult()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download upscaled image
+            </button>
           </div>
           <div class="meta" id="meta"></div>
         </div>
@@ -742,6 +762,30 @@ async function poll(id, tries = 0, uploadPreview = false) {
       setStatus(`<span class="spin"></span>Status: <b>&nbsp;${job.status}&nbsp;</b> · running super-resolution… (${secs}s)`);
     }
     setTimeout(() => poll(id, tries + 1, uploadPreview), 1500);
+  }
+}
+
+async function downloadResult() {
+  const after = $('after');
+  if (!after || !after.src) return;
+  try {
+    let href = after.src;
+    let revoke = null;
+    if (!href.startsWith('data:')) {
+      const res = await fetch(href);
+      const blob = await res.blob();
+      href = URL.createObjectURL(blob);
+      revoke = href;
+    }
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = 'super-resolved-2x.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    if (revoke) setTimeout(() => URL.revokeObjectURL(revoke), 1500);
+  } catch (e) {
+    setStatus('Download failed: ' + e.message, 'err');
   }
 }
 
