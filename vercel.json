@@ -1,7 +1,7 @@
 {
   "framework": null,
   "installCommand": "echo 'no install'",
-  "buildCommand": "echo 'no build'",
+  "buildCommand": "mkdir -p public && echo ok > public/.ok",
   "outputDirectory": "public",
   "rewrites": [
     {
