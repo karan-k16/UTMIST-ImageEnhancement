@@ -14,4 +14,4 @@ COPY utils ./utils
 COPY ml ./ml
 COPY weights ./weights
 
-CMD ["python", "-m", "ml.worker", "--WEIGHTS_PATH", "weights/demo.pth"]
+CMD ["python", "-m", "ml.worker", "--WEIGHTS_PATH", "weights/demo_c96b16.pth", "--CHANNELS", "96", "--NUM_BLOCKS", "16"]

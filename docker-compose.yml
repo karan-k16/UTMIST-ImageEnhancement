@@ -1,13 +1,10 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: utmist_sr_db
     environment:
       POSTGRES_USER: sr_user
       POSTGRES_PASSWORD: sr_password
       POSTGRES_DB: sr_pipeline
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -16,13 +13,10 @@ services:
       timeout: 3s
       retries: 10
 
-  # Full stack (API + demo site). Start with: docker compose --profile full up
   backend:
-    profiles: ["full"]
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: utmist_sr_backend
     environment:
       DATABASE_URL: postgres://sr_user:sr_password@db:5432/sr_pipeline
       BIND_ADDR: 0.0.0.0:8080
@@ -38,17 +32,17 @@ services:
         condition: service_healthy
 
   worker:
-    profiles: ["full"]
     build:
       context: .
       dockerfile: Dockerfile.worker
-    container_name: utmist_sr_worker
     environment:
       BACKEND_URL: http://backend:8080
     command: >
-      python -m ml.worker --WEIGHTS_PATH weights/demo_c96b16.pth
+      python -m ml.worker
+      --WEIGHTS_PATH weights/demo_c96b16.pth
       --CHANNELS 96 --NUM_BLOCKS 16
-      --BACKEND_URL http://backend:8080 --OUTPUT_DIR /data/outputs
+      --BACKEND_URL http://backend:8080
+      --OUTPUT_DIR /data/outputs
     working_dir: /app
     volumes:
       - shared_images:/data
