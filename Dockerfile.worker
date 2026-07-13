@@ -1,17 +1,36 @@
-FROM python:3.12-slim
+# CPU inference worker — builds natively on amd64 and arm64 (Oracle Ampere).
+FROM python:3.12-slim-bookworm
 
-RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 libglib2.0-0 libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY requirements.txt .
-# CPU wheels keep the image small; on a GPU host use the default index + onnxruntime-gpu
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
-    && pip install --no-cache-dir opencv-python-headless numpy scikit-image onnx onnxscript onnxruntime requests
+
+# Install torch from PyPI so the correct arch wheel is picked (x86_64 or aarch64).
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
+    || pip install --no-cache-dir torch \
+    && pip install --no-cache-dir \
+        opencv-python-headless \
+        numpy \
+        scikit-image \
+        onnx \
+        onnxscript \
+        onnxruntime \
+        requests
 
 COPY models ./models
 COPY utils ./utils
 COPY ml ./ml
 COPY weights ./weights
 
-CMD ["python", "-m", "ml.worker", "--WEIGHTS_PATH", "weights/demo_c96b16.pth", "--CHANNELS", "96", "--NUM_BLOCKS", "16"]
+ENV BACKEND_URL=http://backend:8080
+ENV OUTPUT_DIR=/data/outputs
+
+CMD ["python", "-m", "ml.worker", \
+     "--WEIGHTS_PATH", "weights/demo_c96b16.pth", \
+     "--CHANNELS", "96", \
+     "--NUM_BLOCKS", "16", \
+     "--BACKEND_URL", "http://backend:8080", \
+     "--OUTPUT_DIR", "/data/outputs"]

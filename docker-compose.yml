@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: sr_user
       POSTGRES_PASSWORD: sr_password
@@ -17,6 +18,7 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+    restart: unless-stopped
     environment:
       DATABASE_URL: postgres://sr_user:sr_password@db:5432/sr_pipeline
       BIND_ADDR: 0.0.0.0:8080
@@ -35,14 +37,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.worker
+    restart: unless-stopped
     environment:
       BACKEND_URL: http://backend:8080
-    command: >
-      python -m ml.worker
-      --WEIGHTS_PATH weights/demo_c96b16.pth
-      --CHANNELS 96 --NUM_BLOCKS 16
-      --BACKEND_URL http://backend:8080
-      --OUTPUT_DIR /data/outputs
     working_dir: /app
     volumes:
       - shared_images:/data
