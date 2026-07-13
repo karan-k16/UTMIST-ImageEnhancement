@@ -27,10 +27,17 @@ COPY weights ./weights
 
 ENV BACKEND_URL=http://backend:8080
 ENV OUTPUT_DIR=/data/outputs
+# Keep CPU/RAM usage low on Always Free Micro (1 GB).
+ENV OMP_NUM_THREADS=1
+ENV MKL_NUM_THREADS=1
+ENV TORCH_NUM_THREADS=1
 
 CMD ["python", "-m", "ml.worker", \
      "--WEIGHTS_PATH", "weights/demo_c96b16.pth", \
      "--CHANNELS", "96", \
      "--NUM_BLOCKS", "16", \
      "--BACKEND_URL", "http://backend:8080", \
-     "--OUTPUT_DIR", "/data/outputs"]
+     "--OUTPUT_DIR", "/data/outputs", \
+     "--TILE", "128", \
+     "--OVERLAP", "16", \
+     "--MAX_INPUT_HEIGHT", "320"]

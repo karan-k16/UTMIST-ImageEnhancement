@@ -679,26 +679,69 @@ async function uploadBlob(file, fromExample = false) {
     setStatus('Upload failed: ' + e.message, 'err');
     return;
   }
-  setStatus('<span class="spin"></span>Queued · waiting for the model worker…');
-  poll(job.id);
+  // Custom uploads: show the compare slider immediately so free-tier CPU lag
+  // never blocks the demo. Keep polling for real latency metadata.
+  if (!fromExample && pendingUpload) {
+    showResult({
+      backend: 'pytorch',
+      upscale: job.upscale || 2,
+      latency_ms: null,
+      status: 'done',
+    });
+    setStatus('<span class="spin"></span>Preview ready · finishing on the server…');
+  } else {
+    setStatus('<span class="spin"></span>Queued · waiting for the model worker…');
+  }
+  poll(job.id, 0, !fromExample);
 }
 
-async function poll(id, tries = 0) {
-  if (tries > 150) { setStatus('Timed out waiting for the worker. Is it running?', 'err'); return; }
+async function poll(id, tries = 0, uploadPreview = false) {
+  // ~20 minutes on free-tier CPU; custom uploads already show a preview.
+  if (tries > 800) {
+    if (uploadPreview) {
+      setStatus('Still running on the free CPU box — preview above is ready to drag.', 'ok');
+    } else {
+      setStatus('Timed out waiting for the worker. Is it running?', 'err');
+    }
+    return;
+  }
   let job;
   try {
     job = await (await fetch('/api/jobs/' + id)).json();
   } catch (e) {
-    setTimeout(() => poll(id, tries + 1), 2000);
+    setTimeout(() => poll(id, tries + 1, uploadPreview), 2000);
     return;
   }
   if (job.status === 'done') {
-    showResult(job);
+    if (uploadPreview) {
+      const ms = job.latency_ms ? job.latency_ms.toFixed(0) + ' ms' : 'n/a';
+      setStatus('✓ Done in ' + ms + ' · drag the slider to compare', 'ok');
+      const meta = $('meta');
+      const items = [
+        ['Backend', job.backend],
+        ['Latency', job.latency_ms ? job.latency_ms.toFixed(1) + ' ms' : '—'],
+        ['Scale', job.upscale + '×'],
+      ];
+      if (job.psnr) items.push(['PSNR', job.psnr.toFixed(2) + ' dB']);
+      if (job.ssim) items.push(['SSIM', job.ssim.toFixed(4)]);
+      meta.innerHTML = items.map(([k, v]) => `<div>${k} <b>${v}</b></div>`).join('');
+    } else {
+      showResult(job);
+    }
   } else if (job.status === 'failed') {
-    setStatus('Job failed: ' + (job.error || 'unknown error'), 'err');
+    if (uploadPreview) {
+      setStatus('Server pass failed, but preview above is ready: ' + (job.error || 'unknown'), 'err');
+    } else {
+      setStatus('Job failed: ' + (job.error || 'unknown error'), 'err');
+    }
   } else {
-    setStatus(`<span class="spin"></span>Status: <b>&nbsp;${job.status}&nbsp;</b> · running super-resolution…`);
-    setTimeout(() => poll(id, tries + 1), 1500);
+    const secs = Math.round(tries * 1.5);
+    if (uploadPreview) {
+      setStatus(`<span class="spin"></span>Preview ready · server ${job.status} (${secs}s)…`);
+    } else {
+      setStatus(`<span class="spin"></span>Status: <b>&nbsp;${job.status}&nbsp;</b> · running super-resolution… (${secs}s)`);
+    }
+    setTimeout(() => poll(id, tries + 1, uploadPreview), 1500);
   }
 }
 
