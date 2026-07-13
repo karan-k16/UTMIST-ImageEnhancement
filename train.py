@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from utils.data import SRDataset, find_images_recursive, to_rgb, downscale, upscale
+from utils.data import SRDataset, find_images_recursive, to_rgb, downscale, upscale, mod_crop
 from utils.metrics import psnr_rgb, ssim_rgb
 from utils.tiling import infer_tiled
 from models.sr_residual import SRResCNN
@@ -24,7 +24,7 @@ def validate(model, VAL_HR_DIR, UPSCALE, DEVICE="cuda", TILE=512, OVERLAP=32, AM
     files = find_images_recursive(Path(VAL_HR_DIR))
     psnrs, ssims = [], []
     for fp in files:
-        hr_bgr = cv2.imread(fp, cv2.IMREAD_COLOR); hr = to_rgb(hr_bgr)
+        hr_bgr = cv2.imread(fp, cv2.IMREAD_COLOR); hr = mod_crop(to_rgb(hr_bgr), UPSCALE)
         lr = downscale(hr, UPSCALE, kernel_name=DOWNSCALE_KERNEL)
         bic = upscale(lr, UPSCALE, kernel_name=DOWNSCALE_KERNEL)
         sr  = infer_tiled(model, lr, scale=UPSCALE, tile=TILE, overlap=OVERLAP, amp=AMP, device=DEVICE)

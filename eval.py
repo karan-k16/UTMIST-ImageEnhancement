@@ -5,7 +5,7 @@ import cv2
 import torch
 
 from models.sr_residual import SRResCNN
-from utils.data import find_images_recursive, to_rgb, downscale, upscale
+from utils.data import find_images_recursive, to_rgb, downscale, upscale, mod_crop
 from utils.metrics import psnr_rgb, ssim_rgb
 from utils.tiling import infer_tiled
 
@@ -38,7 +38,7 @@ def main():
 
     for idx, fp in enumerate(files):
         hr_bgr = cv2.imread(fp, cv2.IMREAD_COLOR)
-        hr = to_rgb(hr_bgr)
+        hr = mod_crop(to_rgb(hr_bgr), args.UPSCALE)
         lr = downscale(hr, args.UPSCALE, kernel_name=args.DOWNSCALE_KERNEL)
         bic = upscale(lr, args.UPSCALE, kernel_name=args.DOWNSCALE_KERNEL)
         sr  = infer_tiled(model, lr, scale=args.UPSCALE, tile=args.TILE, overlap=args.OVERLAP, amp=args.AMP, device=DEVICE)

@@ -23,6 +23,12 @@ def to_rgb(img):
         img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
     return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+def mod_crop(img: np.ndarray, scale: int) -> np.ndarray:
+    """Crop so height/width are divisible by scale (needed so that
+    downscale -> SR round-trips to exactly the original size)."""
+    h, w = img.shape[:2]
+    return img[: h - h % scale, : w - w % scale]
+
 def downscale(hr_rgb: np.ndarray, scale: int, kernel_name: str = "bicubic") -> np.ndarray:
     h, w = hr_rgb.shape[:2]
     lr_w = w // scale

@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# artifacts & outputs
+artifacts/
+outputs/
+uploads/
+runs/
+data/
+*.onnx
+*.engine
+*.pth
+# ship the live demo checkpoint so the site works out of the box
+!weights/demo_c96b16.pth
+
+# rust
+backend/target/
+
+.DS_Store

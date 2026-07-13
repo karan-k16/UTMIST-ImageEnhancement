@@ -1,0 +1,38 @@
+[
+  {
+    "file": "img_1025_320.png",
+    "name": "Pug in a blanket",
+    "input": "img_1025_input.png",
+    "output": "img_1025_output.png"
+  },
+  {
+    "file": "img_1040_320.png",
+    "name": "Castle",
+    "input": "img_1040_input.png",
+    "output": "img_1040_output.png"
+  },
+  {
+    "file": "img_1069_320.png",
+    "name": "Jellyfish",
+    "input": "img_1069_input.png",
+    "output": "img_1069_output.png"
+  },
+  {
+    "file": "img_110_320.png",
+    "name": "Golden hour",
+    "input": "img_110_input.png",
+    "output": "img_110_output.png"
+  },
+  {
+    "file": "img_237_320.png",
+    "name": "Puppy",
+    "input": "img_237_input.png",
+    "output": "img_237_output.png"
+  },
+  {
+    "file": "picsum_22_320.png",
+    "name": "Autumn park",
+    "input": "picsum_22_input.png",
+    "output": "picsum_22_output.png"
+  }
+]
