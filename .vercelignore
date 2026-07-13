@@ -1,0 +1,24 @@
+# Keep Vercel deploy tiny — Oracle serves the real app.
+backend/
+ml/
+models/
+utils/
+weights/
+artifacts/
+uploads/
+outputs/
+data/
+tests/
+*.pth
+*.onnx
+*.pyc
+__pycache__/
+.venv/
+target/
+Dockerfile*
+docker-compose.yml
+README.md
+train.py
+infer.py
+eval.py
+requirements.txt
